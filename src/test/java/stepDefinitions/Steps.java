@@ -1,8 +1,10 @@
 package stepDefinitions;
 
 import io.cucumber.java.en.Given;
+import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import io.restassured.RestAssured;
+import io.restassured.path.json.JsonPath;
 import io.restassured.response.Response;
 import io.restassured.response.ResponseBody;
 import io.restassured.specification.RequestSpecification;
@@ -13,6 +15,8 @@ import testData.NewUser;
 public class Steps {
 
     private static final String BASE_URL = "https://reqres.in/";
+
+    private static NewUser responseBody;
 
     public RequestSpecification base() {
         RestAssured.baseURI = BASE_URL;
@@ -42,8 +46,18 @@ public class Steps {
         Assert.assertEquals(response.getStatusCode(), 200);
         ResponseBody body = response.getBody();
 
-        NewUser responseBody = body.as(NewUser.class);
+        responseBody = body.as(NewUser.class);
         System.out.println(responseBody.id);
+    }
+
+    @Then("The new user is there")
+    public void the_new_user_is_there() {
+
+        Response response = base().get("/api/users/" + responseBody.id);
+        Assert.assertEquals(response.getStatusCode(), 200);
+
+        JsonPath json = response.jsonPath();
+        Assert.assertEquals(json.get("data.first_name"), "Lindsay");
     }
 
 }

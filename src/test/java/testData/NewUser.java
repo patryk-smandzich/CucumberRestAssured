@@ -1,5 +1,4 @@
 package testData;
-
 public class NewUser {
 
     public String id;
